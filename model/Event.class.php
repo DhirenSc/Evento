@@ -1,12 +1,17 @@
 <?php
+require_once "model/Venue.class.php";
 class Event {
 
-    private $eventId;
+    private $idevent;
     private $name;
     private $datestart;
     private $dateend;
     private $numberallowed;
-    private $venueId;
+    private $venue;
+    
+    public function getIdevent(){
+        return $this->idevent;
+    }
 
     public function getName(){
         return $this->name;
@@ -25,8 +30,11 @@ class Event {
     }
 
     public function getVenue(){
-        return $this->venueId;
+        return $this->venue;
     }
-    
+
+    public function getObjectAsArray(){
+        return get_object_vars($this);
+    }
 }
 ?>

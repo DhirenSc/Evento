@@ -16,7 +16,7 @@ class DB {
     function getData($query, $args, $modelName){
         $stmt = $this->dbh->prepare($query);
         $stmt->execute($args);
-        require_once "./model/".$modelName.".class.php";
+        require_once "model/".$modelName.".class.php";
         $resultByClass = $stmt->fetchAll(PDO::FETCH_CLASS,$modelName);
         return $resultByClass;
     }

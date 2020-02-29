@@ -1,7 +1,7 @@
 <?php
 class Attendee {
 
-    private $attendeeId;
+    private $idattendee;
     private $name;
     private $password;
     private $role;
