@@ -1,11 +1,25 @@
 <?php
+require_once "validations.php";
 date_default_timezone_set('EST');
 session_start();
 if(!empty($_SESSION["loggedIn"])){
-    header("Location: admin.php");
-}
-else if(isset($_POST['email']) && isset($_POST['password'])){
     header("Location: dashboard.php");
+}
+else if(isset($_POST['username']) && isset($_POST['password'])){
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
+    $credCheck = checkCredentials($username, $password);
+    if($credCheck != "Wrong Credentials"){
+        $_SESSION["loggedIn"] = "true";
+        $_SESSION["username"] = $username;
+        $_SESSION["role"] = $credCheck;
+        header("Location: dashboard.php");
+    }
+    else{
+        ?>
+        <script>alert("Wrong Credentials");</script>
+        <?php
+    }
 }
 ?>
 
@@ -25,8 +39,8 @@ else if(isset($_POST['email']) && isset($_POST['password'])){
                             <h3 class="login-heading mb-4">Welcome back!</h3>
                             <form method="POST">
                                 <div class="form-label-group">
-                                    <input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="email" required autofocus>
-                                    <label for="inputEmail">Email address</label>
+                                    <input type="text" id="inputName" class="form-control" placeholder="Username" name="username" required autofocus>
+                                    <label for="inputName">Username</label>
                                 </div>
                                 
                                 <div class="form-label-group">

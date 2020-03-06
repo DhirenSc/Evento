@@ -1,8 +1,8 @@
 <?php  
   
 interface Service { 
-   public  function getSingle(); 
-   public  function getAll(); 
+   public function getSingle($identifier); 
+   public function getAll(); 
 }  
   
 ?> 

@@ -5,6 +5,10 @@ class Venue {
     private $name;
     private $capacity;
 
+    public function getVenueId(){
+        return $this->idvenue;
+    }
+
     public function getName(){
         return $this->name;
     }
@@ -13,5 +17,8 @@ class Venue {
         return $this->capacity;
     }
     
+    public function getObjectAsArray(){
+        return get_object_vars($this);
+    }
 }
 ?>

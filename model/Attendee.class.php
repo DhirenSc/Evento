@@ -6,16 +6,24 @@ class Attendee {
     private $password;
     private $role;
 
+    public function getAttendeeId(){
+        return $this->idattendee;
+    }
+
     public function getName(){
         return $this->name;
     }
 
-    private function getPassword(){
+    public function getPassword(){
         return $this->password;
     }
 
-    private function getRole(){
+    public function getRole(){
         return $this->role;
+    }
+
+    public function getObjectAsArray(){
+        return get_object_vars($this);
     }
     
 }

@@ -26,13 +26,29 @@ class EventService implements Service {
         return self::$instance;
     }
 
-    public function getSingle() {
-
+    public function getSingle($id) {
+        $eventDAO = EventDAO::getInstance();
+        return $eventDAO->getEvent($id);
     }
     
     public function getAll(){
         $eventDAO = EventDAO::getInstance();
         return $eventDAO->getEvents();  
+    }
+
+    public function updateEvent($eventId, $name, $startDate, $endDate, $numberallowed, $venueName){
+        $eventDAO = EventDAO::getInstance();
+        return $eventDAO->updateEvent($eventId, $name, $startDate, $endDate, $numberallowed, $venueName);
+    }
+
+    public function deleteEvent($eventId){
+        $eventDAO = EventDAO::getInstance();
+        return $eventDAO->deleteEvent($eventId);
+    }
+
+    public function getEventByAttendee($username){
+        $eventDAO = EventDAO::getInstance();
+        return $eventDAO->getEventByAttendee($username);
     }
 }
 

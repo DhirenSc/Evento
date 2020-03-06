@@ -28,7 +28,7 @@ function route($action, Closure $callback)
 function dispatch($action)
 {
     global $routes;
-    $action = trim($action, '/~dc6288/Evento/api.php');
+    $action = trim($action, '/~dc6288/EMS/api.php');
     $callback = $routes[$action];
 
     echo call_user_func($callback);
