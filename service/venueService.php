@@ -1,6 +1,6 @@
 <?php 
-require_once "service/serviceInterface.php";
-require_once "dao/VenueDAO.php";
+require_once __DIR__."/serviceInterface.php";
+require __DIR__."/../dao/VenueDAO.php";
 // General singleton class.
 class VenueService implements Service {
     
@@ -34,6 +34,11 @@ class VenueService implements Service {
     public function getSingle($identifier)
     {
         
+    }
+
+    public function insertVenue($name, $capacity){
+        $venueDAO = VenueDAO::getInstance();
+        return $venueDAO->insertVenue($name, $capacity);
     }
 
     public function updateVenue($venueId, $name, $capacity){

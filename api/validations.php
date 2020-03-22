@@ -1,5 +1,5 @@
 <?php
-require_once "service/attendeeService.php";
+require_once __DIR__."/../service/attendeeService.php";
 
 function alphaNumeric($value) {
 	$reg= "/^[A-Za-z0-9]+$/";
@@ -207,5 +207,10 @@ function creditCard($value) {
 function checkCredentials($username, $password){
 	$attendeeService = AttendeeDAO::getInstance();
 	return $attendeeService->checkCredential($username, $password);
+}
+
+function addUser($username, $password){
+	$attendeeService = AttendeeDAO::getInstance();
+	return $attendeeService->insertAttendee($username, $password,"attendee");
 }
 ?>

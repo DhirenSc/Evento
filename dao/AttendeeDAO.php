@@ -1,6 +1,6 @@
 <?php
 
-require_once "./database/connection.php";
+require_once __DIR__."/../database/connection.php";
 class AttendeeDAO{
     
     private $dbo;
@@ -25,6 +25,24 @@ class AttendeeDAO{
     public function getUsers(){
         $attendees = $this->dbo->getData("select idattendee, a.name, r.name as `role` from attendee a join role r on a.role=r.idrole", [], "Attendee");
         return $attendees;
+    }
+
+    public function insertAttendee($name, $password, $role){
+        $checkAttendee = $this->dbo->getData("SELECT * FROM attendee WHERE name=? AND role=?", array($name, $role), "Attendee");
+        if(count($checkAttendee) > 0){
+            return "User already exists";
+        }
+        else{
+            $role = $this->dbo->getData("SELECT idrole FROM role WHERE name=?", array($role), "Role");
+            $roleId = $role[0]->getRoleId();
+            $addRowAffected = $this->dbo->modifyData("INSERT INTO attendee(name, password, role) VALUES(?,?,?)", array($name, hash("sha256",$password), $roleId));
+            if($addRowAffected == 1){
+                return $addRowAffected;
+            }
+            else{
+                return "Unable to add user";
+            }
+        }
     }
     
     public function updateAttendee($attendeeId, $name, $password, $role){
@@ -67,20 +85,37 @@ class AttendeeDAO{
         }
     }
 
-
-    public function deleteVenue($venueId){
-        $events = $this->dbo->getData("SELECT idevent FROM event WHERE venue=?", array($venueId), "Event");
-        if(count($events) >= 1){
-            return "Unable to delete Venue";
-        }
-        else{
-            $deleteVenueRowAffected = $this->dbo->modifyData("DELETE FROM venue WHERE idvenue=?", array($venueId));
-            if($deleteVenueRowAffected == 1){
-                return $deleteVenueRowAffected;
+    public function deleteUser($attendeeId){
+        $this->dbo->beginTransaction();
+        $deleteManagerEvent = $this->dbo->modifyData("DELETE FROM manager_event WHERE manager=?", array($attendeeId));
+        if($deleteManagerEvent >= 0){
+            $deleteSessionAttendee = $this->dbo->modifyData("DELETE FROM attendee_session WHERE attendee=?", array($attendeeId));
+            if($deleteSessionAttendee >= 0){
+                $deleteEventAttendee = $this->dbo->modifyData("DELETE FROM attendee_event WHERE attendee=?", array($attendeeId));
+                if($deleteEventAttendee >= 0){
+                    $deleteAttendee = $this->dbo->modifyData("DELETE FROM attendee WHERE idattendee=?", array($attendeeId));
+                    if($deleteAttendee == 1){
+                        $this->dbo->commit();
+                        return $deleteAttendee;
+                    }
+                    else{
+                        $this->dbo->rollBack();
+                        return "Unable to delete attendee";
+                    }
+                }
+                else{
+                    $this->dbo->rollBack();
+                    return "Unable to delete attendee";
+                }
             }
             else{
-                return "Unable to delete Venue";
+                $this->dbo->rollBack();
+                return "Unable to delete attendee";
             }
+        }
+        else{
+            $this->dbo->rollBack();
+            return "Unable to delete attendee";
         }
     }
 }

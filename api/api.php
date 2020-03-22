@@ -1,12 +1,11 @@
 <?php
 
-require_once "router.php";
-require_once "service/eventService.php";
-require_once "service/sessionService.php";
-require_once "service/venueService.php";
-require_once "service/attendeeService.php";
-require_once "service/roleService.php";
-require_once "validations.php";
+require "../service/eventService.php";
+require "../service/sessionService.php";
+require "../service/venueService.php";
+require "../service/attendeeService.php";
+require "../service/roleService.php";
+require "validations.php";
 /*
 route('/', function () {
     return "Hello World";
@@ -57,11 +56,27 @@ if(isset($_GET["method"]) && !empty($_GET['method'])){
             }
         break;
 
+        case "addEvent":
+            $eventService = EventService::getInstance();
+            if(isset($_POST['name']) && isset($_POST['startEventDate']) && isset($_POST['endEventDate']) && isset($_POST['numberallowed']) && isset($_POST['vName'])){
+                //echo numbers($_POST['sessionId'])."--".alphabeticSpace($_POST['name'])."--".validateDate($_POST['startdate'])."--".validateDate($_POST['enddate'])."--".numbers($_POST['numberallowed'])."--".alphabeticSpace($_POST['eventName']);
+                if(alphabeticSpace($_POST['name']) && validateDate($_POST['startEventDate']) && validateDate($_POST['endEventDate']) && numbers($_POST['numberallowed']) && alphabeticSpaceApost($_POST['vName'])){
+                    echo $eventService->addEvent(trim($_POST['name']), trim($_POST['startEventDate']), trim($_POST['endEventDate']), trim($_POST['numberallowed']), trim($_POST['vName']));
+                }
+                else{
+                    echo "Invalid Datatype";
+                }
+            }
+            else{
+                echo "Invalid parameters";
+            }
+        break;
+
         case "updateEvent":
             $eventService = EventService::getInstance();
             if(isset($_POST['eventId']) && isset($_POST['name']) && isset($_POST['startdate']) && isset($_POST['enddate']) && isset($_POST['numberallowed']) && isset($_POST['vName'])){
                 //echo numbers($_POST['sessionId'])."--".alphabeticSpace($_POST['name'])."--".validateDate($_POST['startdate'])."--".validateDate($_POST['enddate'])."--".numbers($_POST['numberallowed'])."--".alphabeticSpace($_POST['eventName']);
-                if(numbers($_POST['eventId']) && alphabeticSpace($_POST['name']) && validateDate($_POST['startdate']) && validateDate($_POST['enddate']) && numbers($_POST['numberallowed']) && alphabeticSpace($_POST['vName'])){
+                if(numbers($_POST['eventId']) && alphabeticSpace($_POST['name']) && validateDate($_POST['startdate']) && validateDate($_POST['enddate']) && numbers($_POST['numberallowed']) && alphabeticSpaceApost($_POST['vName'])){
                     echo $eventService->updateEvent(trim($_POST['eventId']), trim($_POST['name']), trim($_POST['startdate']), trim($_POST['enddate']), trim($_POST['numberallowed']), trim($_POST['vName']));
                 }
                 else{
@@ -88,8 +103,27 @@ if(isset($_GET["method"]) && !empty($_GET['method'])){
             else if(isset($_GET['id'])){
                 echo arrayToJSON($sessionService->getSessionByEvent($_GET['id']));
             }
+            else if(isset($_GET['manager'])){
+                echo arrayToJSON($sessionService->getSessionByManager($_GET['manager']));
+            }
             else{
                 echo arrayToJSON($sessionService->getAll());
+            }
+        break;
+
+        case "addSession":
+            $sessionService = SessionService::getInstance();
+            if(isset($_POST['name']) && isset($_POST['startSessionDate']) && isset($_POST['endSessionDate']) && isset($_POST['numberallowed']) && isset($_POST['eName'])){
+                //echo numbers($_POST['sessionId'])."--".alphabeticSpace($_POST['name'])."--".validateDate($_POST['startdate'])."--".validateDate($_POST['enddate'])."--".numbers($_POST['numberallowed'])."--".alphabeticSpace($_POST['eventName']);
+                if(alphabeticSpace($_POST['name']) && validateDate($_POST['startSessionDate']) && validateDate($_POST['endSessionDate']) && numbers($_POST['numberallowed']) && alphabeticSpace($_POST['eName'])){
+                    echo $sessionService->insertSession(trim($_POST['name']), trim($_POST['startSessionDate']), trim($_POST['endSessionDate']), trim($_POST['numberallowed']), trim($_POST['eName']));
+                }
+                else{
+                    echo "Invalid Datatype";
+                }
+            }
+            else{
+                echo "Invalid parameters";
             }
         break;
 
@@ -116,16 +150,40 @@ if(isset($_GET["method"]) && !empty($_GET['method'])){
             }
         break;
 
+        case "registerSession":
+            $sessionService = SessionService::getInstance();
+            if(isset($_GET['sessionId']) && isset($_GET['username'])){
+                if(numbers($_GET['sessionId']) && alphabeticSpace($_GET['username']))
+                echo $sessionService->registerSession(trim($_GET['sessionId']), trim($_GET['username']));
+            }
+        break;
+
         case "getVenues":
             $venueService = VenueService::getInstance();
             echo arrayToJSON($venueService->getAll());
+        break;
+
+        case "addVenue":
+            $venueService = VenueService::getInstance();
+            if(isset($_POST['name']) && isset($_POST['capacity'])){
+                //echo numbers($_POST['sessionId'])."--".alphabeticSpace($_POST['name'])."--".validateDate($_POST['startdate'])."--".validateDate($_POST['enddate'])."--".numbers($_POST['numberallowed'])."--".alphabeticSpace($_POST['eventName']);
+                if(alphabeticSpaceApost($_POST['name']) && numbers($_POST['capacity'])){
+                    echo $venueService->insertVenue(trim($_POST['name']), trim($_POST['capacity']));
+                }
+                else{
+                    echo "Invalid Datatype";
+                }
+            }
+            else{
+                echo "Invalid parameters";
+            }
         break;
 
         case "updateVenue":
             $venueService = VenueService::getInstance();
             if(isset($_POST['venueId']) && isset($_POST['name']) && isset($_POST['capacity'])){
                 //echo numbers($_POST['sessionId'])."--".alphabeticSpace($_POST['name'])."--".validateDate($_POST['startdate'])."--".validateDate($_POST['enddate'])."--".numbers($_POST['numberallowed'])."--".alphabeticSpace($_POST['eventName']);
-                if(numbers($_POST['venueId']) && alphabeticSpace($_POST['name']) && numbers($_POST['capacity'])){
+                if(numbers($_POST['venueId']) && alphabeticSpaceApost($_POST['name']) && numbers($_POST['capacity'])){
                     echo $venueService->updateVenue(trim($_POST['venueId']), trim($_POST['name']), trim($_POST['capacity']));
                 }
                 else{
@@ -154,6 +212,22 @@ if(isset($_GET["method"]) && !empty($_GET['method'])){
             echo arrayToJSON($attendeeService->getAll());
         break;
 
+        case "addUser":
+            $attendeeService = AttendeeService::getInstance();
+            if(isset($_POST['name']) && isset($_POST['role']) && isset($_POST['password'])){
+                //echo numbers($_POST['sessionId'])."--".alphabeticSpace($_POST['name'])."--".validateDate($_POST['startdate'])."--".validateDate($_POST['enddate'])."--".numbers($_POST['numberallowed'])."--".alphabeticSpace($_POST['eventName']);
+                if(alphabeticSpace($_POST['name']) && alphabeticSpace($_POST['role']) && (alphabeticNumericPunct($_POST['password']) || $_POST['password'] == "")){
+                    echo $attendeeService->insertAttendee(trim($_POST['name']), trim($_POST['password']), trim($_POST['role']));
+                }
+                else{
+                    echo "Invalid Datatype";
+                }
+            }
+            else{
+                echo "Invalid parameters";
+            }
+        break;
+
         case "updateUser":
             $attendeeService = AttendeeService::getInstance();
             if(isset($_POST['attendeeId']) && isset($_POST['name']) && isset($_POST['role']) && isset($_POST['password'])){
@@ -169,7 +243,13 @@ if(isset($_GET["method"]) && !empty($_GET['method'])){
                 echo "Invalid parameters";
             }
         break;
-    
+
+        case "deleteUser":
+            $attendeeService = AttendeeService::getInstance();
+            if(isset($_POST['attendeeId']) && numbers($_POST['attendeeId'])){
+                echo $attendeeService->deleteAttendee($_POST['attendeeId']);
+            }
+        break;
     }
 }
 

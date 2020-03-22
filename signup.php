@@ -8,16 +8,15 @@ if(!empty($_SESSION["loggedIn"])){
 else if(isset($_POST['username']) && isset($_POST['password'])){
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
-    $credCheck = checkCredentials($username, $password);
-    if($credCheck != "Wrong Credentials"){
-        $_SESSION["loggedIn"] = "true";
-        $_SESSION["username"] = $username;
-        $_SESSION["role"] = $credCheck;
-        header("Location: ui/dashboard.php");
+    $addUser = addUser($username, $password);
+    if($addUser != "Wrong Credentials" || $addUser != "Unable to add user"){
+        ?>
+        <script>alert("Registered"); window.location.href="http://serenity.ist.rit.edu/~dc6288/EMS/login.php"</script>
+        <?php
     }
     else{
         ?>
-        <script>alert("Wrong Credentials");</script>
+        <script>alert("Unable to register");</script>
         <?php
     }
 }
@@ -36,7 +35,7 @@ else if(isset($_POST['username']) && isset($_POST['password'])){
                 <div class="container">
                     <div class="row">
                         <div class="col-md-9 col-lg-8 mx-auto">
-                            <h3 class="login-heading mb-4">Welcome back!</h3>
+                            <h3 class="login-heading mb-4">Sign Up!</h3>
                             <form method="POST">
                                 <div class="form-label-group">
                                     <input type="text" id="inputName" class="form-control" placeholder="Username" name="username" required autofocus>
@@ -47,10 +46,7 @@ else if(isset($_POST['username']) && isset($_POST['password'])){
                                     <input type="password" id="inputPassword" class="form-control" placeholder="Password"name="password" required>
                                     <label for="inputPassword">Password</label>
                                 </div>
-                                <button class="btn btn-lg btn-primary btn-block btn-login text-uppercase font-weight-bold mb-2" type="submit">Sign in</button>
-                                <div class="text-center">
-                                    <a class="lead" href="#">Forgot password?</a>
-                                </div>
+                                <button class="btn btn-lg btn-primary btn-block btn-login text-uppercase font-weight-bold mb-2" type="submit">Sign up</button>
                             </form>
                         </div>
                     </div>

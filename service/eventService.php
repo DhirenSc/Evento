@@ -1,6 +1,6 @@
 <?php 
-include "serviceInterface.php";
-include "dao/EventDAO.php";
+require_once __DIR__."/serviceInterface.php";
+require __DIR__."/../dao/EventDAO.php";
 // General singleton class.
 class EventService implements Service {
     
@@ -36,6 +36,11 @@ class EventService implements Service {
         return $eventDAO->getEvents();  
     }
 
+    public function addEvent($name, $startDate, $endDate, $numberallowed, $venueName){
+        $eventDAO = EventDAO::getInstance();
+        return $eventDAO->addEvent($name, $startDate, $endDate, $numberallowed, $venueName);
+    }
+
     public function updateEvent($eventId, $name, $startDate, $endDate, $numberallowed, $venueName){
         $eventDAO = EventDAO::getInstance();
         return $eventDAO->updateEvent($eventId, $name, $startDate, $endDate, $numberallowed, $venueName);
@@ -50,6 +55,7 @@ class EventService implements Service {
         $eventDAO = EventDAO::getInstance();
         return $eventDAO->getEventByAttendee($username);
     }
+
 }
 
 ?>

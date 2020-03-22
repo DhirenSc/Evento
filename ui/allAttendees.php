@@ -1,6 +1,6 @@
 <?php session_start();
 if(!isset($_SESSION['loggedIn'])){
-  header("Location: login.php");
+  header("Location: ../login.php");
 }
 ?>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -9,7 +9,7 @@ if(!isset($_SESSION['loggedIn'])){
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
-<link rel="stylesheet" type="text/css" href="navbar-top-fixed.css">
+<link rel="stylesheet" type="text/css" href="css/navbar-top-fixed.css">
 
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
   <a class="navbar-brand" href="#">Evento</a>
@@ -31,9 +31,9 @@ if(!isset($_SESSION['loggedIn'])){
       <?php }?>
       <li class="nav-item">
         <a class="nav-link" href="allSessions.php">Sessions</a>
-      </li>
-      <button type="button" class="btn btn-primary logout">Logout</button> 
+      </li> 
     </ul>
+    <button type="button" class="btn btn-primary logout">Logout</button>
   </div>
 </nav>
 
@@ -63,9 +63,9 @@ if(!isset($_SESSION['loggedIn'])){
         <div class="form-group row">
             <label for="inputRole" class="col-sm-3 col-form-label">Role</label>
             <div class="col-sm-9">
-                <select class="custom-select role-select">
-                    <option selected disabled>Open this select menu</option>
-                </select>
+              <select class="custom-select role-select">
+                  <option selected disabled>Open this select menu</option>
+              </select>
             </div>
         </div>
       </div>
@@ -77,16 +77,131 @@ if(!isset($_SESSION['loggedIn'])){
   </div>
 </div>
 
-<div class="container">
+<!--Add attendee modal-->
+<div class="modal fade" id="addAttendeeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Add Attendee</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row">
+          <label for="inputAddAttendeeName" class="col-sm-3 col-form-label">Name</label>
+          <div class="col-sm-9">
+              <input type="text" class="form-control" id="inputAddAttendeeName" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputAddAttendeePassword" class="col-sm-3 col-form-label">Password</label>
+          <div class="col-sm-9">
+              <input type="password" class="form-control" id="inputAddAttendeePassword">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputAddAttendeeRole" class="col-sm-3 col-form-label">Role</label>
+          <div class="col-sm-9">
+            <select class="custom-select role-add-attendee-select">
+                <option selected disabled>Open this select menu</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary add-attendee-modal-btn">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container attendee-container">
+  <div class="row justify-content-center">
+    <h2>Attendees</h2><br/>
+  </div>
+  <div class="row">
+    <button type="button" class="btn btn-primary btn-block add-attendee">Add New Attendee</button>
+  </div>
+  <br/>
   <div class="row justify-content-center" id="users"></div>
 </div>
 
 <script>
   $.ajax({
-    url:'http://serenity.ist.rit.edu/~dc6288/EMS/api.php?method=getUsers',
+    url:'http://serenity.ist.rit.edu/~dc6288/EMS/api/api.php?method=getUsers',
     success: function(content){
-        console.log(content);
       console.log(JSON.parse(content));
+
+      $(".logout").click(function(){
+        $.ajax({
+          url:"http://serenity.ist.rit.edu/~dc6288/EMS/logout.php",
+          success: function(content){
+            if(content == "LoggedOut"){
+              console.log("LOGGED OUT");
+              window.location.href = "http://serenity.ist.rit.edu/~dc6288/EMS/login.php";
+            }
+          }
+        });
+      });
+
+      $(".add-attendee" ).click(function() {
+        $('#addAttendeeModal').modal('show'); 
+        
+        if($('.role-add-attendee-select option').length == 1){
+          $.ajax({
+              url:'http://serenity.ist.rit.edu/~dc6288/EMS/api/api.php?method=getRoles',
+              success: function(content){
+                $.each(JSON.parse(content), function(index, obj){
+                let myOption = $(`<option value="${obj.name}" id="${obj.idrole}">${obj.name}</option>`);
+                myOption.appendTo(".role-add-attendee-select");
+                });
+              }
+          });
+        }
+      });
+
+      $(".add-attendee-modal-btn").click(function(){
+        let name = $("#inputAddAttendeeName").val();
+        let password = $("#inputAddAttendeePassword").val();
+        let role = $(".role-add-attendee-select").children("option:selected").val();
+        if(name !== "" && role !== "Open this select menu" && password !== ""){
+          $.ajax({
+            url:'http://serenity.ist.rit.edu/~dc6288/EMS/api/api.php?method=addUser',
+            type: "POST",
+            data: {name, password, role},
+            success: function(content){
+              if(content == 1){
+                  $('#addAttendeeModal').modal('hide');
+                  $.confirm({
+                      title: 'Alert!',
+                      content: 'Edit Successful!',
+                      buttons: {
+                          Ok: function () {
+                              location.reload(true);
+                          }
+                      }
+                  });
+              }
+              else{
+                  $('#addAttendeeModal').modal('hide');
+                  $.alert({
+                      title: 'Alert!',
+                      content: 'Edit Unsuccessful!',
+                  });
+              }
+            }
+          });
+        }
+        else{
+          $('#addAttendeeModal').modal('hide');
+          $.alert({
+              title: 'Alert!',
+              content: 'No Change in data',
+          });
+        }
+      });
       
       let htmlContent = $(`<table class="table table-hover">
       <thead>
@@ -110,7 +225,6 @@ if(!isset($_SESSION['loggedIn'])){
             </td>`);
         myUser.appendTo(htmlContent);
       });
-
       $("</tbody></table>").appendTo(htmlContent);
       htmlContent.appendTo("#users");
 
@@ -139,7 +253,7 @@ if(!isset($_SESSION['loggedIn'])){
           $("#inputRole").val(currentRole);
           if($('.role-select option').length == 1){
             $.ajax({
-                url:'http://serenity.ist.rit.edu/~dc6288/EMS/api.php?method=getRoles',
+                url:'http://serenity.ist.rit.edu/~dc6288/EMS/api/api.php?method=getRoles',
                 success: function(content){
                     $.each(JSON.parse(content), function(index, obj){
                     let myOption;
@@ -162,7 +276,7 @@ if(!isset($_SESSION['loggedIn'])){
         let role = $(".role-select").children("option:selected").val();
         if(!(name == currentName && role == currentRole && password == currentPassword)){
             $.ajax({
-            url:'http://serenity.ist.rit.edu/~dc6288/EMS/api.php?method=updateUser',
+            url:'http://serenity.ist.rit.edu/~dc6288/EMS/api/api.php?method=updateUser',
             type: "POST",
             data: {attendeeId, name, password, role},
             success: function(content){
@@ -206,7 +320,7 @@ if(!isset($_SESSION['loggedIn'])){
               buttons: {
                   Confirm: function () {
                     $.ajax({
-                        url:'http://serenity.ist.rit.edu/~dc6288/EMS/api.php?method=deleteUser',
+                        url:'http://serenity.ist.rit.edu/~dc6288/EMS/api/api.php?method=deleteUser',
                         type: "POST",
                         data: {attendeeId},
                         success: function(content){

@@ -1,5 +1,5 @@
 <?php
-include_once "database/connection.php";
+require_once __DIR__."/../database/connection.php";
 
 class EventDAO {
     
@@ -36,8 +36,14 @@ class EventDAO {
     public function addEvent($eventName, $datestart, $dateend, $numberallowed, $venue){
         $venueObject = $this->dbo->getData("SELECT idvenue FROM venue WHERE name=?", array($venue), "Venue");
         $venueId = $venueObject[0]->getVenueId();
-        $addRowAffected = $this->dbo->modifyData("INSERT INTO EVENT(name, datestart, dateend, numberallowed, venue) VALUES(?,?,?,?,?)", array($eventName, $datestart, $dateend, $numberallowed, $venueId));
-        return $addRowAffected;
+        $checkEvent = $this->dbo->getData("SELECT * FROM event WHERE name=? AND datestart=? AND dateend=? AND numberallowed=? AND venue=?", array($eventName, $datestart, $dateend, $numberallowed, $venueId), "Event");
+        if(count($checkEvent > 0)){
+            return "Event already exists";
+        }
+        else{
+            $addRowAffected = $this->dbo->modifyData("INSERT INTO event(name, datestart, dateend, numberallowed, venue) VALUES(?,?,?,?,?)", array($eventName, $datestart, $dateend, $numberallowed, $venueId));
+            return $addRowAffected;
+        }
     }
 
     public function updateEvent($eventId, $name, $startDate, $endDate, $numberallowed, $venueName){
@@ -55,20 +61,26 @@ class EventDAO {
             if($attendeeEventRowsAff >= 0){
                 $flag = false;
                 $eventSessions = $this->dbo->getData("SELECT * FROM session WHERE event=?", array($eventId), "Session");
-                foreach ($eventSessions as $session) {
-                    $sessionId = $session->getObjectAsArray()['idsession'];
-                    $attendeeSessionRA = $this->dbo->modifyData("DELETE FROM attendee_session WHERE session=?", array($sessionId));
-                    $sessionDeleteRowsAffected = $this->dbo->modifyData("DELETE FROM session WHERE idsession=?", array($sessionId));
-                    if($attendeeSessionRA >= 0 && $sessionDeleteRowsAffected >= 0){
-                        $flag = true;
+                if(count($eventSessions) > 0){
+                    foreach ($eventSessions as $session) {
+                        $sessionId = $session->getObjectAsArray()['idsession'];
+                        $attendeeSessionRA = $this->dbo->modifyData("DELETE FROM attendee_session WHERE session=?", array($sessionId));
+                        $sessionDeleteRowsAffected = $this->dbo->modifyData("DELETE FROM session WHERE idsession=?", array($sessionId));
+                        if($attendeeSessionRA >= 0 && $sessionDeleteRowsAffected >= 0){
+                            $flag = true;
+                        }
+                        else{
+                            $flag = false;
+                        break;
+                        }
                     }
-                    else{
-                        $flag = false;
-                    break;
-                    }
+                }
+                else{
+                    $flag = true;
                 }
                 if($flag == false){
                     $this->dbo->rollBack();
+                    
                     return "Unable to delete event";
                 }
                 else{

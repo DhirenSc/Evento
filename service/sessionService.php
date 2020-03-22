@@ -1,6 +1,6 @@
-<?php 
-require_once "service/serviceInterface.php";
-require_once "dao/SessionDAO.php";
+<?php
+require_once __DIR__."/serviceInterface.php";
+require __DIR__."/../dao/SessionDAO.php";
 // General singleton class.
 class SessionService implements Service {
     
@@ -41,6 +41,11 @@ class SessionService implements Service {
         return $sessionDAO->getSessionByEvent($eventId);
     }
 
+    public function insertSession($name, $startDate, $endDate, $numberallowed, $eventName){
+        $sessionDAO = SessionDAO::getInstance();
+        return $sessionDAO->insertSession($name, $startDate, $endDate, $numberallowed, $eventName);
+    }
+
     public function updateSession($sessionId, $name, $startDate, $endDate, $numberallowed, $eventName){
         $sessionDAO = SessionDAO::getInstance();
         return $sessionDAO->updateSession($sessionId, $name, $startDate, $endDate, $numberallowed, $eventName);
@@ -54,6 +59,16 @@ class SessionService implements Service {
     public function getSessionByAttendee($username){
         $sessionDAO = SessionDAO::getInstance();
         return $sessionDAO->getSessionByAttendee($username);
+    }
+
+    public function getSessionByManager($managerUsername){
+        $sessionDAO = SessionDAO::getInstance();
+        return $sessionDAO->getSessionByManager($managerUsername);
+    }
+
+    public function registerSession($sessionId, $username){
+        $sessionDAO = SessionDAO::getInstance();
+        return $sessionDAO->registerSession($sessionId, $username);
     }
 }
 

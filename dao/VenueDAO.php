@@ -1,6 +1,6 @@
 <?php
 
-require_once "./database/connection.php";
+require_once __DIR__."/../database/connection.php";
 class VenueDAO{
     
     private $dbo;
@@ -25,6 +25,17 @@ class VenueDAO{
     public function getVenues(){
         $venues = $this->dbo->getData("select * from venue", [], "Venue");
         return $venues;
+    }
+
+    public function insertVenue($name, $capacity){
+        $checkVenue = $this->dbo->getData("SELECT * FROM venue WHERE name=? AND capacity=?", array($name, intval($capacity)), "Venue");
+        if(count($checkVenue) > 0){
+            return "Venue already exists";
+        }
+        else{
+            $insertRowAffected = $this->dbo->modifyData("INSERT INTO venue(name, capacity) VALUES(?, ?)", array($name, intval($capacity)));
+            return $insertRowAffected;
+        }
     }
     
     public function updateVenue($venueId, $name, $capacity){

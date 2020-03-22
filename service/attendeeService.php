@@ -1,6 +1,6 @@
 <?php 
-require_once "service/serviceInterface.php";
-require_once "dao/AttendeeDAO.php";
+require_once __DIR__."/serviceInterface.php";
+require __DIR__."/../dao/AttendeeDAO.php";
 // General singleton class.
 class AttendeeService implements Service {
     
@@ -36,6 +36,12 @@ class AttendeeService implements Service {
         $attendeeDAO = AttendeeDAO::getInstance();
         return $attendeeDAO->getUsers();
     }
+
+    public function insertAttendee($name, $password, $role){
+        $attendeeDAO = AttendeeDAO::getInstance();
+        return $attendeeDAO->insertAttendee($name, $password, $role);
+    }
+
     public function updateAttendee($attendeeId, $name, $password, $role){
         $attendeeDAO = AttendeeDAO::getInstance();
         return $attendeeDAO->updateAttendee($attendeeId, $name, $password, $role);
@@ -43,7 +49,7 @@ class AttendeeService implements Service {
 
     public function deleteAttendee($attendeeId){
         $attendeeDAO = AttendeeDAO::getInstance();
-        //return $attendeeDAO->deleteAttendee($attendeeId);
+        return $attendeeDAO->deleteUser($attendeeId);
     }
 
     public function checkCredential($username, $password){

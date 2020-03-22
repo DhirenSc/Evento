@@ -1,5 +1,4 @@
 <?php
-require_once "model/Venue.class.php";
 class Event {
 
     private $idevent;

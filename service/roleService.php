@@ -1,6 +1,6 @@
 <?php 
-require_once "service/serviceInterface.php";
-require_once "dao/RoleDAO.php";
+require_once __DIR__."/serviceInterface.php";
+require __DIR__."/../dao/RoleDAO.php";
 // General singleton class.
 class RoleService implements Service {
     
